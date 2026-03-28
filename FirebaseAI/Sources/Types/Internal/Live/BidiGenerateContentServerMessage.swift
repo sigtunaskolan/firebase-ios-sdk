@@ -37,6 +37,9 @@ struct BidiGenerateContentServerMessage: Sendable {
 
     /// Server will disconnect soon.
     case goAway(GoAway)
+
+    /// Session resumption handle update.
+    case sessionResumptionUpdate(SessionResumptionUpdate)
   }
 
   /// The message type.
@@ -57,6 +60,7 @@ extension BidiGenerateContentServerMessage: Decodable {
     case toolCall
     case toolCallCancellation
     case goAway
+    case sessionResumptionUpdate
     case usageMetadata
   }
 
@@ -85,6 +89,11 @@ extension BidiGenerateContentServerMessage: Decodable {
       messageType = .toolCallCancellation(toolCallCancellation)
     } else if let goAway = try container.decodeIfPresent(GoAway.self, forKey: .goAway) {
       messageType = .goAway(goAway)
+    } else if let update = try container.decodeIfPresent(
+      SessionResumptionUpdate.self,
+      forKey: .sessionResumptionUpdate
+    ) {
+      messageType = .sessionResumptionUpdate(update)
     } else {
       throw InvalidMessageTypeError()
     }
